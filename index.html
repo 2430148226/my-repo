@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大乐透选号</title>
+    <style>
+        /* 定义自定义字体 */
+        @font-face {
+            font-family: 'CustomFont';
+            src: url('fonts/CustomFont.ttf') format('truetype');
+        }
+
+        /* 设置页面基本样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('111.png'); /* 背景图片 */
+            background-size: cover; /* 背景图片覆盖整个页面 */
+            background-position: center; /* 背景图片居中 */
+            background-repeat: no-repeat; /* 背景图片不重复 */
+            background-attachment: fixed; /* 背景图片固定 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            flex-direction: column;
+        }
+
+        /* 设置下拉框样式 */
+        .lottery-select {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 5px 15px;
+            font-size: 16px;
+            width: 150px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.7); /* 半透明背景 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* 阴影效果 */
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        /* 设置容器样式 */
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.8); /* 半透明背景 */
+            padding: 30px;
+            border-radius: 15px; /* 圆角 */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* 设置标题样式 */
+        .title {
+            font-family: 'CustomFont', serif;
+            font-size: 50px;
+            color: #FFA500;
+            margin-bottom: 20px;
+            letter-spacing: 6px; /* 字符间距 */
+            font-weight: bold;
+        }
+
+        /* 设置球的容器样式 */
+        .balls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+
+        /* 设置球的基本样式 */
+        .ball {
+            width: 60px;
+            height: 60px;
+            line-height: 60px;
+            text-align: center;
+            border-radius: 50%; /* 圆形 */
+            margin: 10px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2)); /* 渐变背景 */
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5), 0 4px 8px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: 20px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        /* 红球的样式 */
+        .ball.red-ball {
+            background: linear-gradient(145deg, rgba(255, 0, 0, 0.9), rgba(255, 0, 0, 0.2)); /* 渐变红色背景 */
+            border: 1px solid rgba(255, 0, 0, 0.5);
+        }
+
+        /* 蓝球的样式 */
+        .ball.blue-ball {
+            background: linear-gradient(145deg, rgba(0, 0, 255, 0.9), rgba(0, 0, 255, 0.2)); /* 渐变蓝色背景 */
+            border: 1px solid rgba(0, 0, 255, 0.5);
+        }
+
+        /* 按钮的基本样式 */
+        button {
+            margin: 15px;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px; /* 圆角 */
+        }
+
+        /* 暂停按钮样式 */
+        #pause-btn {
+            background-color: #FF6347;
+            color: white;
+        }
+
+        /* 开始按钮样式 */
+        #start-btn {
+            background-color: #4682B4;
+            color: white;
+        }
+
+        /* 复制按钮样式 */
+        #copy-btn {
+            background-color: #32CD32;
+            color: white;
+        }
+
+        /* 显示历史记录按钮样式 */
+        #history-btn {
+            background-color: #FFD700;
+            color: white;
+        }
+
+        /* 隐藏历史记录按钮样式 */
+        #hide-history-btn {
+            background-color: #FFA500;
+            color: white;
+        }
+
+        /* 号码筛选器样式 */
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-container label {
+            margin: 10px;
+        }
+
+        .filter-container input {
+            margin: 0 5px;
+            padding: 5px;
+            width: 100px;
+            font-size: 16px;
+            text-align: center;
+            border-radius: 10px; /* 圆角 */
+            border: 1px solid #ccc; /* 边框颜色 */
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); /* 内阴影效果 */
+            outline: none;
+        }
+
+        /* 按钮悬停样式 */
+        button:hover {
+            opacity: 0.8;
+        }
+
+        /* 禁用按钮样式 */
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        /* 动图的样式 */
+        .gif-image {
+            position: absolute;
+            top: 10px;
+            right: 0px;
+            width: 250px;
+            height: 250px;
+        }
+
+        /* 提示信息样式 */
+        .message {
+            color: #FF6347;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        /* 历史记录样式 */
+        .history {
+            display: none;
+            margin-top: 20px;
+        }
+
+        /* 媒体查询适配移动端 */
+        @media (max-width: 600px) {
+            .title {
+                font-size: 36px;
+                letter-spacing: 3px;
+            }
+
+            .ball {
+                width: 50px;
+                height: 50px;
+                line-height: 50px;
+                font-size: 16px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+
+            .gif-image {
+                width: 200px;
+                height: 200px;
+            }
+
+            .lottery-select {
+                font-size: 14px;
+                width: 120px;
+                padding: 5px 10px;
+            }
+
+            .filter-container input {
+                width: 80px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 彩种选择下拉框 -->
+    <select class="lottery-select" id="lottery-select">
+        <option value="dlt">大乐透</option>
+        <option value="ssq">双色球</option>
+        <option value="pl3">排列三</option>
+        <option value="pl5">排列五</option>
+    </select>
+    <!-- 动图 -->
+    <img src="animated.gif" class="gif-image" alt="Animated GIF"> 
+    <!-- 容器 -->
+    <div class="container">
+        <!-- 标题 -->
+        <div class="title" id="title">祝君中奖</div>
+        <!-- 红球容器 -->
+        <div class="balls" id="red-balls">
+            <div class="ball red-ball"></div>
+            <div class="ball red-ball"></div>
+            <div class="ball red-ball"></div>
+            <div class="ball red-ball"></div>
+            <div class="ball red-ball"></div>
+        </div>
+        <!-- 蓝球容器 -->
+        <div class="balls" id="blue-balls">
+            <div class="ball blue-ball"></div>
+            <div class="ball blue-ball"></div>
+        </div>
+        <!-- 按钮 -->
+        <button id="pause-btn">暂停</button>
+        <button id="start-btn" disabled>开始</button>
+        <button id="copy-btn">复制</button>
+        <button id="history-btn">显示历史记录</button>
+        <button id="hide-history-btn" style="display: none;">隐藏历史记录</button>
+        <!-- 号码筛选器 -->
+        <div class="filter-container" id="filter-container">
+            <label>排除红球: <input type="text" id="exclude-red-numbers" placeholder="用逗号分隔"></label>
+            <label>必选红球: <input type="text" id="include-red-numbers" placeholder="用逗号分隔"></label>
+            <label id="exclude-blue-label">排除蓝球: <input type="text" id="exclude-blue-numbers" placeholder="用逗号分隔"></label>
+            <label id="include-blue-label">必选蓝球: <input type="text" id="include-blue-numbers" placeholder="用逗号分隔"></label>
+        </div>
+        <div id="message" class="message"></div>
+        <div id="history" class="history">
+            <button id="clear-history-btn">清除历史记录</button>
+        </div>
+    </div>
+    <script>
+        // 获取HTML元素
+        const redBallsContainer = document.getElementById('red-balls'); // 红球容器
+        const blueBallsContainer = document.getElementById('blue-balls'); // 蓝球容器
+        const pauseBtn = document.getElementById('pause-btn'); // 暂停按钮
+        const startBtn = document.getElementById('start-btn'); // 开始按钮
+        const copyBtn = document.getElementById('copy-btn'); // 复制按钮
+        const historyBtn = document.getElementById('history-btn'); // 显示历史记录按钮
+        const clearHistoryBtn = document.getElementById('clear-history-btn'); // 清除历史记录按钮
+        const hideHistoryBtn = document.getElementById('hide-history-btn'); // 隐藏历史记录按钮
+        const message = document.getElementById('message'); // 提示信息
+        const history = document.getElementById('history'); // 历史记录区域
+        const lotterySelect = document.getElementById('lottery-select'); // 彩种选择下拉框
+        const excludeRedNumbersInput = document.getElementById('exclude-red-numbers'); // 排除红球输入框
+        const excludeBlueNumbersInput = document.getElementById('exclude-blue-numbers'); // 排除蓝球输入框
+        const includeRedNumbersInput = document.getElementById('include-red-numbers'); // 必选红球输入框
+        const includeBlueNumbersInput = document.getElementById('include-blue-numbers'); // 必选蓝球输入框
+        const excludeBlueLabel = document.getElementById('exclude-blue-label'); // 排除蓝球标签
+        const includeBlueLabel = document.getElementById('include-blue-label'); // 必选蓝球标签
+
+        let redInterval; // 红球滚动间隔
+        let blueInterval; // 蓝球滚动间隔
+        let isRolling = false; // 滚动状态标志
+        let speed = 40; // 设置滚动速度，单位：毫秒
+        let historyNumbers = { // 记录历史选择号码
+            dlt: [],
+            ssq: [],
+            pl3: [],
+            pl5: []
+        }; 
+        let numberCount = { red: {}, blue: {} }; // 记录号码统计
+        let currentLottery = 'dlt'; // 当前选择的彩种
+
+        // 生成唯一随机数的函数，排除特定号码
+        function generateUniqueRandomNumber(min, max, exclude = []) {
+            let randomNumber;
+            do {
+                randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+            } while (exclude.includes(randomNumber));
+            return randomNumber;
+        }
+
+        // 更新号码统计
+        function updateNumberCount(numbers, type) {
+            numbers.forEach(number => {
+                if (!numberCount[type][number]) {
+                    numberCount[type][number] = 0;
+                }
+                numberCount[type][number]++;
+            });
+        }
+
+        // 更新球的数值
+        function updateBalls() {
+            let redNumbers = []; // 存储红球数值的数组
+            let blueNumbers = []; // 存储蓝球数值的数组
+            let redMax = 35; // 红球最大值
+            let blueMax = 12; // 蓝球最大值
+
+            if (currentLottery === 'ssq') { // 如果选择了双色球
+                redMax = 33;
+                blueMax = 16;
+            } else if (currentLottery === 'pl3' || currentLottery === 'pl5') { // 如果选择了排列三或排列五
+                redMax = 9;
+            }
+
+            // 获取排除号码
+            const excludeRedNumbers = excludeRedNumbersInput.value.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num));
+            const excludeBlueNumbers = excludeBlueNumbersInput.value.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num));
+
+            // 获取必选号码
+            const includeRedNumbers = includeRedNumbersInput.value.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num));
+            const includeBlueNumbers = includeBlueNumbersInput.value.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num));
+
+            // 生成不重复的红球数值
+            while (redNumbers.length < redBallsContainer.children.length) {
+                let randomNumber;
+                if (includeRedNumbers.length > 0) {
+                    randomNumber = includeRedNumbers.shift(); // 优先使用必选号码
+                } else {
+                    randomNumber = generateUniqueRandomNumber(1, redMax, redNumbers.concat(excludeRedNumbers));
+                }
+                if (!redNumbers.includes(randomNumber)) {
+                    redNumbers.push(randomNumber);
+                }
+            }
+
+            // 生成不重复的蓝球数值
+            while (blueNumbers.length < blueBallsContainer.children.length) {
+                let randomNumber;
+                if (includeBlueNumbers.length > 0) {
+                    randomNumber = includeBlueNumbers.shift(); // 优先使用必选号码
+                } else {
+                    randomNumber = generateUniqueRandomNumber(1, blueMax, blueNumbers.concat(excludeBlueNumbers));
+                }
+                if (!blueNumbers.includes(randomNumber)) {
+                    blueNumbers.push(randomNumber);
+                }
+            }
+
+            // 更新红球的显示
+            Array.from(redBallsContainer.children).forEach((ball, index) => {
+                ball.innerText = redNumbers[index];
+            });
+
+            // 更新蓝球的显示
+            Array.from(blueBallsContainer.children).forEach((ball, index) => {
+                ball.innerText = blueNumbers[index];
+            });
+
+            // 更新号码统计
+            updateNumberCount(redNumbers, 'red');
+            updateNumberCount(blueNumbers, 'blue');
+        }
+
+        // 根据选择的彩种更新球的数量
+        function updateBallCount() {
+            let redCount = 5;
+            let blueCount = 2;
+
+            if (currentLottery === 'ssq') {
+                redCount = 6;
+                blueCount = 1;
+            } else if (currentLottery === 'pl3') {
+                redCount = 3;
+                blueCount = 0;
+            } else if (currentLottery === 'pl5') {
+                redCount = 5;
+                blueCount = 0;
+            }
+
+            // 更新红球数量
+            redBallsContainer.innerHTML = '';
+            for (let i = 0; i < redCount; i++) {
+                const ball = document.createElement('div');
+                ball.classList.add('ball', 'red-ball');
+                redBallsContainer.appendChild(ball);
+            }
+
+            // 更新蓝球数量
+            blueBallsContainer.innerHTML = '';
+            for (let i = 0; i < blueCount; i++) {
+                const ball = document.createElement('div');
+                ball.classList.add('ball', 'blue-ball');
+                blueBallsContainer.appendChild(ball);
+            }
+
+            // 显示或隐藏蓝球筛选输入框
+            if (currentLottery === 'pl3' || currentLottery === 'pl5') {
+                excludeBlueLabel.style.display = 'none';
+                includeBlueLabel.style.display = 'none';
+            } else {
+                excludeBlueLabel.style.display = 'inline-block';
+                includeBlueLabel.style.display = 'inline-block';
+            }
+        }
+
+        // 选择彩种事件监听
+        lotterySelect.addEventListener('change', (event) => {
+            currentLottery = event.target.value; // 获取选择的彩种
+            updateBallCount(); // 更新球的数量
+            updateBalls(); // 更新球的数值
+            clearHistory(); // 清除历史记录
+        });
+
+        // 开始滚动函数
+        function startRolling() {
+            if (!isRolling) { // 检查是否已经在滚动
+                redInterval = setInterval(updateBalls, speed); // 开始红球滚动
+                blueInterval = setInterval(updateBalls, speed); // 开始蓝球滚动
+                isRolling = true; // 设置滚动状态为true
+                startBtn.disabled = true; // 禁用开始按钮
+                pauseBtn.disabled = false; // 启用暂停按钮
+                showMessage('号码生成中...');
+            }
+        }
+
+        // 停止滚动函数
+        function stopRolling() {
+            clearInterval(redInterval); // 清除红球滚动间隔
+            clearInterval(blueInterval); // 清除蓝球滚动间隔
+            isRolling = false; // 设置滚动状态为false
+            startBtn.disabled = false; // 启用开始按钮
+            pauseBtn.disabled = true; // 禁用暂停按钮
+            saveHistory(); // 保存历史记录
+            showMessage('号码已生成！');
+        }
+
+        // 复制数值函数
+        function copyNumbers() {
+            const redNumbers = Array.from(redBallsContainer.children).map(ball => parseInt(ball.innerText)).sort((a, b) => a - b);
+            const blueNumbers = Array.from(blueBallsContainer.children).map(ball => parseInt(ball.innerText)).sort((a, b) => a - b);
+            const numbers = `红球: ${redNumbers.join(', ')}${blueNumbers.length ? `\n蓝球: ${blueNumbers.join(', ')}` : ''}`;
+            navigator.clipboard.writeText(numbers); // 复制到剪贴板
+            alert('已复制选号！'); // 弹出提示框
+        }
+
+        // 显示消息函数
+        function showMessage(msg) {
+            message.innerText = msg; // 更新消息内容
+        }
+
+        // 保存历史记录函数
+        function saveHistory() {
+            const redNumbers = Array.from(redBallsContainer.children).map(ball => parseInt(ball.innerText)).sort((a, b) => a - b);
+            const blueNumbers = Array.from(blueBallsContainer.children).map(ball => parseInt(ball.innerText)).sort((a, b) => a - b);
+            const numbers = `红球: ${redNumbers.join(', ')}${blueNumbers.length ? ` 蓝球: ${blueNumbers.join(', ')}` : ''}`;
+            historyNumbers[currentLottery].push(numbers); // 将号码保存到历史记录中
+        }
+
+        // 显示历史记录函数
+        function showHistory() {
+            if (historyNumbers[currentLottery].length > 0) {
+                let historyHtml = '<h3>历史记录：</h3>';
+                historyHtml += '<ul>';
+                historyNumbers[currentLottery].forEach(numbers => {
+                    historyHtml += `<li>${numbers}</li>`;
+                });
+                historyHtml += '</ul>';
+                historyHtml += '<button id="clear-history-btn">清除历史记录</button>';
+                history.innerHTML = historyHtml;
+                history.style.display = 'block';
+                hideHistoryBtn.style.display = 'inline-block';
+                historyBtn.style.display = 'none';
+                document.getElementById('clear-history-btn').addEventListener('click', clearHistory);
+            } else {
+                history.innerHTML = '<p>暂无历史记录</p>';
+            }
+        }
+
+        // 清除历史记录函数
+        function clearHistory() {
+            historyNumbers[currentLottery] = []; // 清空当前彩种的历史记录
+            history.innerHTML = '<p>暂无历史记录</p>'; // 更新显示内容
+        }
+
+        // 隐藏历史记录函数
+        function hideHistory() {
+            history.style.display = 'none'; // 隐藏历史记录区域
+            hideHistoryBtn.style.display = 'none'; // 隐藏按钮
+            historyBtn.style.display = 'inline-block'; // 显示按钮
+        }
+
+        // 按钮事件监听
+        pauseBtn.addEventListener('click', stopRolling); // 暂停按钮点击事件
+        startBtn.addEventListener('click', startRolling); // 开始按钮点击事件
+        copyBtn.addEventListener('click', copyNumbers); // 复制按钮点击事件
+        historyBtn.addEventListener('click', showHistory); // 显示历史记录按钮点击事件
+        hideHistoryBtn.addEventListener('click', hideHistory); // 隐藏历史记录按钮点击事件
+
+        // 初始启动滚动
+        startRolling(); // 页面加载后立即启动滚动
+    </script>
+</body>
+</html>
